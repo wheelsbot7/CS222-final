@@ -31,6 +31,36 @@ const char *getRankName(Rank rank) {
   return rankNames[rank];
 }
 
+int getValue(Rank rank) {
+  switch (rank) {
+  case ACE:
+    return 11; // Can be 1 or 11, 11 is more interesting so we're doing that
+  case TWO:
+    return 2;
+  case THREE:
+    return 3;
+  case FOUR:
+    return 4;
+  case FIVE:
+    return 5;
+  case SIX:
+    return 6;
+  case SEVEN:
+    return 7;
+  case EIGHT:
+    return 8;
+  case NINE:
+    return 9;
+  case TEN:
+  case JACK:
+  case QUEEN:
+  case KING:
+    return 10;
+  default:
+    return 0; // Should never happen
+  }
+}
+
 // Function to create a standard deck of 52 cards
 Card *createDeck() {
   Card *head = NULL;
