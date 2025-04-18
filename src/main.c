@@ -44,7 +44,8 @@ void OnePloop(Deck *deck) {
       printf("Dealer's face-down card: %s of %s\n", getRankName(current.rank),
              getSuitName(current.suit));
       dealScore += getValue(current.rank);
-      printf("Dealer's SECRET score: %d\n", dealScore);
+      printf("Dealer's SECRET score: %d (pretend you can't see this)\n",
+             dealScore);
 
       current = *getNextCard(deck);
       printf("Your cards: \n%s of %s\n", getRankName(current.rank),
@@ -98,7 +99,6 @@ void OnePloop(Deck *deck) {
       valid = 0;
     }
   }
-  freeDeck(deck);
 }
 
 void TwoPloop(Deck *deck) {

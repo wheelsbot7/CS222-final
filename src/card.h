@@ -41,9 +41,6 @@ typedef struct {
 Card *createCard(Suit suit, Rank rank);
 
 int getValue(Rank rank);
-int deckLength(Card *deck);
-Card *getCardAt(Card *deck, int index);
-void swapCards(Card *deck, int i, int j);
 void shuffleDeck(Deck *deck);
 const char *getSuitName(Suit suit);
 const char *getRankName(Rank rank);
