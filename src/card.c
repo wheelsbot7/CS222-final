@@ -61,17 +61,24 @@ int getValue(Rank rank) {
   }
 }
 
-// Function to create a standard deck of 52 cards
-Card *createDeck() {
-  Card *head = NULL;
+Deck *createDeck() {
+  Deck *deck = (Deck *)malloc(sizeof(Deck));
+  if (deck == NULL) {
+    fprintf(stderr, "Memory allocation failed\n");
+    exit(EXIT_FAILURE);
+  }
+
+  deck->head = NULL;
   Card *tail = NULL;
+  deck->size = 0;
 
   for (int s = HEARTS; s < NUM_SUITS; s++) {
     for (int r = ACE; r < NUM_RANKS; r++) {
       Card *newCard = createCard(s, r);
+      deck->size++;
 
-      if (head == NULL) {
-        head = newCard;
+      if (deck->head == NULL) {
+        deck->head = newCard;
         tail = newCard;
       } else {
         tail->next = newCard;
@@ -80,7 +87,8 @@ Card *createDeck() {
     }
   }
 
-  return head;
+  deck->current = deck->head; // Start at the first card
+  return deck;
 }
 
 // Function to get the length of the deck
@@ -123,47 +131,77 @@ void swapCards(Card *deck, int i, int j) {
   cardJ->rank = tempRank;
 }
 
-// Function to shuffle the deck
-void shuffleDeck(Card *deck) {
-  int length = deckLength(deck);
+void shuffleDeck(Deck *deck) {
+  if (deck == NULL || deck->head == NULL)
+    return;
 
-  // Seed the random number generator
-  srand(time(NULL));
-
-  for (int i = length - 1; i > 0; i--) {
-    int j = rand() % (i + 1);
-    swapCards(deck, i, j);
-  }
-}
-
-// Function to print the deck
-void printDeck(Card *deck) {
-  Card *current = deck;
-  int count = 0;
-
-  while (current != NULL) {
-    printf("%-5s of %-8s", getRankName(current->rank),
-           getSuitName(current->suit));
-    count++;
-
-    // Print 4 cards per line for better formatting
-    if (count % 4 == 0) {
-      printf("\n");
-    } else {
-      printf("\t");
-    }
-
+  // Convert linked list to array for easier shuffling
+  Card **cards = (Card **)malloc(deck->size * sizeof(Card *));
+  Card *current = deck->head;
+  for (int i = 0; i < deck->size; i++) {
+    cards[i] = current;
     current = current->next;
   }
-  printf("\nTotal cards in deck: %d\n", count);
+
+  // Fisher-Yates shuffle
+  srand(time(NULL));
+  for (int i = deck->size - 1; i > 0; i--) {
+    int j = rand() % (i + 1);
+    // Swap the cards
+    Suit tempSuit = cards[i]->suit;
+    Rank tempRank = cards[i]->rank;
+    cards[i]->suit = cards[j]->suit;
+    cards[i]->rank = cards[j]->rank;
+    cards[j]->suit = tempSuit;
+    cards[j]->rank = tempRank;
+  }
+
+  free(cards);
+  deck->current = deck->head; // Reset to first card after shuffling
 }
 
-// Function to free the memory used by the deck
-void freeDeck(Card *deck) {
-  Card *current = deck;
+Card *getNextCard(Deck *deck) {
+  if (deck == NULL || deck->current == NULL) {
+    return NULL;
+  }
+
+  Card *currentCard = deck->current;
+
+  // Move to next card
+  deck->current = deck->current->next;
+
+  // If we've reached the end, shuffle and reset
+  if (deck->current == NULL) {
+    printf("\nReached end of deck - shuffling and resetting...\n");
+    shuffleDeck(deck);
+  }
+
+  return currentCard;
+}
+
+void printDeckState(Deck *deck) {
+  printf("Deck contains %d cards\n", deck->size);
+
+  // Print the next 5 cards or remaining cards
+  printf("Next cards: ");
+  Card *temp = deck->current;
+  int count = 0;
+  while (temp != NULL && count < 5) {
+    printf("%s of %s", getRankName(temp->rank), getSuitName(temp->suit));
+    temp = temp->next;
+    count++;
+    if (temp != NULL && count < 5)
+      printf(", ");
+  }
+  printf("\n");
+}
+
+void freeDeck(Deck *deck) {
+  Card *current = deck->head;
   while (current != NULL) {
     Card *next = current->next;
     free(current);
     current = next;
   }
+  free(deck);
 }

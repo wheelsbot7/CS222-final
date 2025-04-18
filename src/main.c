@@ -1,5 +1,5 @@
 /*
- * main.c - main file for Project 3 SIMS
+ * main.c - main file for Final Project
  * Authoer:
  * Date:
  * Purpose:
@@ -9,8 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-void OnePloop(Card *deck) {
-  Card current = *deck;
+void OnePloop(Deck *deck) {
+  Card current = *getNextCard(deck);
   int valid = 1;
   int roundValid = 1;
   int chips = 1000;
@@ -18,70 +18,100 @@ void OnePloop(Card *deck) {
   int dealScore = 0;
   int pScore = 0;
   char buffer[20];
+  int hitting;
   while (valid) {
-    printf("Dealer's face-up card: %s of %s\n", getRankName(current.rank),
-           getSuitName(current.suit));
-    dealScore += getValue(current.rank);
-    printf("Dealer's current score: %d\n", dealScore);
-    current = *current.next;
-    printf("Dealer's face-down card: %s of %s\n", getRankName(current.rank),
-           getSuitName(current.suit));
-    dealScore += getValue(current.rank);
-    printf("Dealer's SECRET score: %d\n", dealScore);
-    // Individual round logic
-
-    current = *current.next;
-    printf("Your cards: \n%s of %s\n", getRankName(current.rank),
-           getSuitName(current.suit));
-    pScore += getValue(current.rank);
-    current = *current.next;
-    printf("%s of %s\n", getRankName(current.rank), getSuitName(current.suit));
-    pScore += getValue(current.rank);
     while (roundValid) {
-      if (pScore > 21) {
-        printf("%d Busted.\n", pScore);
-        roundValid = 0;
-      } else {
-        printf("Current score: %d\n", pScore);
-        printf("Hit or Stand? (h/S): ");
+      while (1) {
+        printf("You have %d chips. Enter your current bet: ", chips);
         fgets(buffer, 20, stdin);
-        buffer[strcspn(buffer, "\n")] = '\0';
-        if (!strcmp(buffer, "h\n") || !strcmp(buffer, "H\n")) {
-          current = *current.next;
-          printf("%s of %s\n", getRankName(current.rank),
-                 getSuitName(current.suit));
-          pScore += getValue(current.rank);
+        bet = atoi(buffer);
+        if (bet > chips) {
+          printf("You don't have that many chips.\n");
         } else {
-          if (pScore > dealScore) {
-            chips += bet;
-            printf("Jackpot! You now have %d chips\n", chips);
-            roundValid = 0;
-          } else if (pScore == dealScore) {
-            printf("Tie! You now have %d chips\n", chips);
-            roundValid = 0;
+          break;
+        }
+      }
+      dealScore = 0;
+      pScore = 0;
+      hitting = 1;
+      roundValid = 1;
+      // Individual round logic
+      printf("Dealer's face-up card: %s of %s\n", getRankName(current.rank),
+             getSuitName(current.suit));
+      dealScore += getValue(current.rank);
+      printf("Dealer's current score: %d\n", dealScore);
+      current = *getNextCard(deck);
+      printf("Dealer's face-down card: %s of %s\n", getRankName(current.rank),
+             getSuitName(current.suit));
+      dealScore += getValue(current.rank);
+      printf("Dealer's SECRET score: %d\n", dealScore);
+
+      current = *getNextCard(deck);
+      printf("Your cards: \n%s of %s\n", getRankName(current.rank),
+             getSuitName(current.suit));
+      pScore += getValue(current.rank);
+      current = *getNextCard(deck);
+      printf("%s of %s\n", getRankName(current.rank),
+             getSuitName(current.suit));
+      pScore += getValue(current.rank);
+      while (hitting) {
+        if (pScore > 21) {
+          chips -= bet;
+          printf("Current score: %d\n", pScore);
+          printf("Busted! You now have %d chips\n", chips);
+          roundValid = 0;
+          hitting = 0;
+        } else {
+          printf("Current score: %d\n", pScore);
+          printf("Hit or Stand? (h/S): ");
+          fgets(buffer, 20, stdin);
+          if (!strcmp(buffer, "h\n") || !strcmp(buffer, "H\n")) {
+            current = *getNextCard(deck);
+            printf("%s of %s\n", getRankName(current.rank),
+                   getSuitName(current.suit));
+            pScore += getValue(current.rank);
           } else {
-            chips -= bet;
-            printf("Busted! You now have %d chips\n", chips);
-            roundValid = 0;
+            hitting = 0;
+            if (pScore > dealScore) {
+              chips += bet;
+              printf("Jackpot! You now have %d chips\n", chips);
+              roundValid = 0;
+            } else if (pScore == dealScore) {
+              printf("Tie! You now have %d chips\n", chips);
+              roundValid = 0;
+            } else {
+              chips -= bet;
+              printf("Busted! You now have %d chips\n", chips);
+              roundValid = 0;
+            }
           }
         }
       }
     }
-    valid = 0;
+    printf("Try again? (y/N): ");
+    fgets(buffer, 20, stdin);
+    if (!strcmp(buffer, "y\n") || !strcmp(buffer, "Y\n")) {
+      roundValid = 1;
+      current = *getNextCard(deck);
+      continue;
+    } else {
+      valid = 0;
+    }
   }
+  freeDeck(deck);
 }
 
-void TwoPloop(Card *deck) {
-  Card current = *deck;
+void TwoPloop(Deck *deck) {
+  Card current = *getNextCard(deck);
   printf("Draw 2 cards\n");
   printf("%s of %s\n", getRankName(current.rank), getSuitName(current.suit));
-  current = *current.next;
+  current = *getNextCard(deck);
   printf("%s of %s\n", getRankName(current.rank), getSuitName(current.suit));
 }
 
 int main() {
   // Create a deck of cards
-  Card *deck = createDeck();
+  Deck *deck = createDeck();
   char buffer[20];
   shuffleDeck(deck);
 

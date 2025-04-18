@@ -31,6 +31,12 @@ typedef struct Card {
   struct Card *next; // Pointer to the next card in the deck
 } Card;
 
+typedef struct {
+  Card *head;    // First card in the deck
+  Card *current; // Current card position
+  int size;      // Number of cards in the deck
+} Deck;
+
 // Function to create a new card
 Card *createCard(Suit suit, Rank rank);
 
@@ -38,10 +44,11 @@ int getValue(Rank rank);
 int deckLength(Card *deck);
 Card *getCardAt(Card *deck, int index);
 void swapCards(Card *deck, int i, int j);
-void shuffleDeck(Card *deck);
+void shuffleDeck(Deck *deck);
 const char *getSuitName(Suit suit);
 const char *getRankName(Rank rank);
-Card *createDeck();
-void printDeck(Card *deck);
-void freeDeck(Card *deck);
+Deck *createDeck();
+void printDeckState(Deck *deck);
+void freeDeck(Deck *deck);
+Card *getNextCard(Deck *deck);
 #endif
