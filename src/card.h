@@ -48,4 +48,7 @@ Deck *createDeck();
 void printDeckState(Deck *deck);
 void freeDeck(Deck *deck);
 Card *getNextCard(Deck *deck);
+int deckLength(Card *deck);
+Card *getCardAt(Card *deck, int index);
+void swapCards(Card *deck, int i, int j);
 #endif
