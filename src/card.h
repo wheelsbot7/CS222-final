@@ -37,9 +37,7 @@ typedef struct {
   int size;      // Number of cards in the deck
 } Deck;
 
-// Function to create a new card
 Card *createCard(Suit suit, Rank rank);
-
 int getValue(Rank rank);
 void shuffleDeck(Deck *deck);
 const char *getSuitName(Suit suit);

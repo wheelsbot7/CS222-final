@@ -31,6 +31,7 @@ const char *getRankName(Rank rank) {
   return rankNames[rank];
 }
 
+// Function to get the card's integer value in Blackjack, aces high
 int getValue(Rank rank) {
   switch (rank) {
   case ACE:
@@ -61,6 +62,7 @@ int getValue(Rank rank) {
   }
 }
 
+// Essentially a macro to call createCard() 52 times with the correct paramaters
 Deck *createDeck() {
   Deck *deck = (Deck *)malloc(sizeof(Deck));
   if (deck == NULL) {
@@ -131,6 +133,7 @@ void swapCards(Card *deck, int i, int j) {
   cardJ->rank = tempRank;
 }
 
+// Function to shuffle the deck by swapping random cards
 void shuffleDeck(Deck *deck) {
   if (deck == NULL || deck->head == NULL)
     return;
@@ -160,6 +163,8 @@ void shuffleDeck(Deck *deck) {
   deck->current = deck->head; // Reset to first card after shuffling
 }
 
+// Function to get next card by the current card's pointer, with code to shuffle
+// if the end of the deck is reached
 Card *getNextCard(Deck *deck) {
   if (deck == NULL || deck->current == NULL) {
     return NULL;
@@ -179,6 +184,7 @@ Card *getNextCard(Deck *deck) {
   return currentCard;
 }
 
+// Test function to verify deck generation
 void printDeckState(Deck *deck) {
   printf("Deck contains %d cards\n", deck->size);
 
@@ -196,6 +202,8 @@ void printDeckState(Deck *deck) {
   printf("\n");
 }
 
+// Function to free each card 1 by 1 since we didn't malloc the deck directly,
+// only the cards
 void freeDeck(Deck *deck) {
   Card *current = deck->head;
   while (current != NULL) {
